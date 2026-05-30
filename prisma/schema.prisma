@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Profile {
+  id        String   @id @db.Uuid
+  username  String?
+  homeCity  String?  @map("home_city")
+  bikeType  String?  @map("bike_type")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("profiles")
+}
+
+model Destination {
+  id                     String       @id @default(uuid()) @db.Uuid
+  name                   String
+  province               String
+  region                 String
+  description            String
+  type                   DestType
+  difficulty             Difficulty
+  estimatedDistanceKm    Int          @map("estimated_distance_km")
+  estimatedDurationHours Float        @map("estimated_duration_hours")
+  roadType               String       @map("road_type")
+  bestTimeToVisit        String       @map("best_time_to_visit")
+  heroImageUrl           String?      @map("hero_image_url")
+  latitude               Float
+  longitude              Float
+  isFeatured             Boolean      @default(false) @map("is_featured")
+  isAiGenerated          Boolean      @default(false) @map("is_ai_generated")
+  createdAt              DateTime     @default(now()) @map("created_at")
+  checkpoints            Checkpoint[]
+  routes                 Route[]
+  savedRoutes            SavedRoute[]
+
+  @@map("destinations")
+}
+
+model Checkpoint {
+  id            String      @id @default(uuid()) @db.Uuid
+  destinationId String      @map("destination_id") @db.Uuid
+  name          String
+  type          CpType
+  description   String
+  latitude      Float
+  longitude     Float
+  orderIndex    Int         @map("order_index")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  destination   Destination @relation(fields: [destinationId], references: [id])
+
+  @@map("checkpoints")
+}
+
+model Route {
+  id                String      @id @default(uuid()) @db.Uuid
+  destinationId     String      @map("destination_id") @db.Uuid
+  startLocationName String      @map("start_location_name")
+  startLatitude     Float       @map("start_latitude")
+  startLongitude    Float       @map("start_longitude")
+  mapboxRouteData   Json?       @map("mapbox_route_data")
+  createdAt         DateTime    @default(now()) @map("created_at")
+  destination       Destination @relation(fields: [destinationId], references: [id])
+  savedRoutes       SavedRoute[]
+
+  @@map("routes")
+}
+
+model SavedRoute {
+  id            String      @id @default(uuid()) @db.Uuid
+  userId        String      @map("user_id") @db.Uuid
+  destinationId String      @map("destination_id") @db.Uuid
+  routeId       String      @map("route_id") @db.Uuid
+  savedAt       DateTime    @default(now()) @map("saved_at")
+  destination   Destination @relation(fields: [destinationId], references: [id])
+  route         Route       @relation(fields: [routeId], references: [id])
+
+  @@map("saved_routes")
+}
+
+model AiSuggestion {
+  id                 String   @id @default(uuid()) @db.Uuid
+  userId             String?  @map("user_id") @db.Uuid
+  startLocation      String   @map("start_location")
+  rideType           String   @map("ride_type")
+  durationPreference String   @map("duration_preference")
+  suggestionsJson    Json     @map("suggestions_json")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  @@map("ai_suggestions")
+}
+
+enum DestType {
+  mountain
+  coastal
+  province
+  city
+  highway
+}
+
+enum Difficulty {
+  easy
+  moderate
+  challenging
+}
+
+enum CpType {
+  fuel
+  food
+  scenic
+  rest
+  attraction
+}

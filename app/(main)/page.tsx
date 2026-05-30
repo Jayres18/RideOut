@@ -4,26 +4,36 @@ import { useState } from "react";
 import Link from "next/link";
 import { Bell, MapPin, ChevronDown, Search, Sparkles, ChevronRight } from "lucide-react";
 import DestinationCard from "@/components/destination/DestinationCard";
-import BottomNav from "@/components/layout/BottomNav";
 import { FEATURED, POPULAR } from "@/lib/seed-data";
 
-const FILTER_CHIPS = ["All", "Near Me", "Mountain", "Coastal", "Long Ride", "Short Ride"];
+const FILTER_CHIPS = [
+  "All",
+  "Near Me",
+  "Mountain",
+  "Coastal",
+  "Long Ride",
+  "Short Ride",
+];
 
 export default function HomePage() {
   const [activeFilter, setActiveFilter] = useState("All");
 
   return (
-    <div className="flex flex-col min-h-screen bg-ride-bg">
+    <div className="flex flex-col min-h-full bg-ride-bg">
       {/* Header */}
       <header className="px-5 pt-12 pb-4">
         <div className="flex items-center justify-between mb-1">
-          <span className="text-ride-orange font-bold text-xl tracking-tight">RideOut</span>
+          <span className="text-ride-orange font-bold text-xl tracking-tight">
+            RideOut
+          </span>
           <button className="relative p-2 rounded-full bg-ride-surface border border-ride-border">
             <Bell size={18} className="text-ride-text" />
             <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-ride-orange" />
           </button>
         </div>
         <p className="text-ride-muted text-sm">Where are you riding today?</p>
+
+        {/* Location pill */}
         <button className="mt-3 flex items-center gap-1.5 bg-ride-surface border border-ride-border rounded-full px-3 py-1.5 text-sm text-ride-text">
           <MapPin size={13} className="text-ride-orange" />
           <span className="font-medium">Metro Manila</span>
@@ -75,8 +85,13 @@ export default function HomePage() {
       {/* Featured Rides */}
       <section className="mb-6">
         <div className="flex items-center justify-between px-5 mb-3">
-          <h2 className="text-ride-text font-semibold text-[15px]">Featured Rides</h2>
-          <Link href="/explore" className="flex items-center gap-0.5 text-ride-orange text-[13px] font-medium">
+          <h2 className="text-ride-text font-semibold text-[15px]">
+            Featured Rides
+          </h2>
+          <Link
+            href="/explore"
+            className="flex items-center gap-0.5 text-ride-orange text-[13px] font-medium"
+          >
             See all <ChevronRight size={14} />
           </Link>
         </div>
@@ -88,10 +103,15 @@ export default function HomePage() {
       </section>
 
       {/* Popular Routes */}
-      <section className="px-5 mb-24">
+      <section className="px-5 mb-6">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-ride-text font-semibold text-[15px]">Popular Routes</h2>
-          <Link href="/explore" className="flex items-center gap-0.5 text-ride-orange text-[13px] font-medium">
+          <h2 className="text-ride-text font-semibold text-[15px]">
+            Popular Routes
+          </h2>
+          <Link
+            href="/explore"
+            className="flex items-center gap-0.5 text-ride-orange text-[13px] font-medium"
+          >
             See all <ChevronRight size={14} />
           </Link>
         </div>
@@ -101,8 +121,6 @@ export default function HomePage() {
           ))}
         </div>
       </section>
-
-      <BottomNav />
     </div>
   );
 }
