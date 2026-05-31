@@ -50,6 +50,24 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* View transition — radial reveal on theme switch */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+  clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 50%));
+  animation: vt-reveal 0.45s ease forwards;
+}
+
+@keyframes vt-reveal {
+  to {
+    clip-path: circle(var(--vt-r, 100vmax) at var(--vt-x, 50%) var(--vt-y, 50%));
+  }
+}
+
 /* Hide scrollbar but keep scroll functionality */
 .scrollbar-hide {
   -ms-overflow-style: none;
