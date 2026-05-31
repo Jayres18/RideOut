@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Bell, MapPin, ChevronDown, Search, Sparkles, ChevronRight } from "lucide-react";
 import DestinationCard from "@/components/destination/DestinationCard";
 import BottomNav from "@/components/layout/BottomNav";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 import { FEATURED, POPULAR } from "@/lib/seed-data";
 
 const FILTER_CHIPS = ["All", "Near Me", "Mountain", "Coastal", "Long Ride", "Short Ride"];
@@ -18,10 +19,13 @@ export default function HomePage() {
       <header className="px-5 pt-12 pb-4">
         <div className="flex items-center justify-between mb-1">
           <span className="text-ride-orange font-bold text-xl tracking-tight">RideOut</span>
-          <button className="relative p-2 rounded-full bg-ride-surface border border-ride-border">
-            <Bell size={18} className="text-ride-text" />
-            <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-ride-orange" />
-          </button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <button className="relative p-2 rounded-full bg-ride-surface border border-ride-border">
+              <Bell size={18} className="text-ride-text" />
+              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-ride-orange" />
+            </button>
+          </div>
         </div>
         <p className="text-ride-muted text-sm">Where are you riding today?</p>
         <button className="mt-3 flex items-center gap-1.5 bg-ride-surface border border-ride-border rounded-full px-3 py-1.5 text-sm text-ride-text">
