@@ -15,9 +15,9 @@ export async function generateRideSuggestions(
   rideType: string,
   duration: string
 ): Promise<DestinationSuggestion[]> {
-  const userPrompt = `Suggest 3 motorcycle ride destinations for a rider starting from ${startLocation}.
-Ride type preference: ${rideType}
-Ride duration: ${duration}
+  const userPrompt = `Suggest 3 motorcycle ride destinations for a rider starting from "${startLocation}".
+Ride type preference: "${rideType}"
+Ride duration: "${duration}"
 
 For each destination, return:
 {
@@ -56,11 +56,40 @@ For each destination, return:
     messages: [{ role: 'user', content: userPrompt }],
   })
 
-  const text = message.content[0].type === 'text' ? message.content[0].text : ''
-  const parsed: ClaudeResponseShape = JSON.parse(text)
+  // Guard: verify content[0] exists and is text type
+  if (!message.content[0] || message.content[0].type !== 'text') {
+    throw new Error('Claude response missing text content')
+  }
 
+  const text = message.content[0].text
+
+  // Try-catch for JSON parse with diagnostic logging
+  let parsed: ClaudeResponseShape
+  try {
+    parsed = JSON.parse(text)
+  } catch (error) {
+    const truncated = text.substring(0, 200)
+    console.error('JSON parse failed. Raw response:', truncated)
+    throw new Error(`Failed to parse Claude response as JSON: ${error instanceof Error ? error.message : String(error)}`)
+  }
+
+  // Validate shape and structure
   if (!Array.isArray(parsed.destinations) || parsed.destinations.length !== 3) {
-    throw new Error('Claude returned unexpected shape')
+    console.error('Invalid destinations shape. Raw response:', text.substring(0, 200))
+    throw new Error('Claude returned unexpected shape: expected array of 3 destinations')
+  }
+
+  // Validate each destination has required fields
+  for (let i = 0; i < parsed.destinations.length; i++) {
+    const dest = parsed.destinations[i]
+    if (typeof dest.name !== 'string' || !dest.name.trim()) {
+      console.error('Invalid destination name at index', i)
+      throw new Error(`Destination ${i} missing or invalid name (must be non-empty string)`)
+    }
+    if (typeof dest.latitude !== 'number' || typeof dest.longitude !== 'number') {
+      console.error('Invalid coordinates at destination index', i)
+      throw new Error(`Destination ${i} missing or invalid latitude/longitude (must be numbers)`)
+    }
   }
 
   return parsed.destinations
