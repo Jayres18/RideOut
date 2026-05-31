@@ -3,18 +3,29 @@ import { prisma } from '@/lib/prisma'
 import { generateRideSuggestions } from '@/lib/claude'
 import type { DestinationSuggestion } from '@/types/suggest'
 
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json()
-    const { startLocation, rideType, duration } = body as {
-      startLocation: string
-      rideType: string
-      duration: string
-    }
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000 // 24 hours
 
-    if (!startLocation?.trim() || !rideType?.trim() || !duration?.trim()) {
-      return Response.json({ error: 'startLocation, rideType, and duration are required' }, { status: 400 })
-    }
+export async function POST(request: NextRequest) {
+  // Validate request body before any async operations
+  let body: unknown
+  try {
+    body = await request.json()
+  } catch {
+    return Response.json({ error: 'Invalid JSON' }, { status: 400 })
+  }
+
+  const { startLocation, rideType, duration } = body as {
+    startLocation: string
+    rideType: string
+    duration: string
+  }
+
+  if (!startLocation?.trim() || !rideType?.trim() || !duration?.trim()) {
+    return Response.json({ error: 'startLocation, rideType, and duration are required' }, { status: 400 })
+  }
+
+  // Process cache lookup and Claude call; return 500 on system failures only
+  try {
 
     // Check cache: same params within last 24 hours
     const cached = await prisma.aiSuggestion.findFirst({
@@ -22,7 +33,7 @@ export async function POST(request: NextRequest) {
         startLocation: startLocation.trim(),
         rideType: rideType.trim(),
         durationPreference: duration.trim(),
-        createdAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+        createdAt: { gte: new Date(Date.now() - CACHE_TTL_MS) },
       },
       orderBy: { createdAt: 'desc' },
     })
@@ -39,6 +50,7 @@ export async function POST(request: NextRequest) {
     )
 
     // Persist to ai_suggestions (best-effort — still return on failure)
+    // If DB persist fails, savedId will be null; client should handle this gracefully
     let savedId: string | null = null
     try {
       const saved = await prisma.aiSuggestion.create({
@@ -46,7 +58,7 @@ export async function POST(request: NextRequest) {
           startLocation: startLocation.trim(),
           rideType: rideType.trim(),
           durationPreference: duration.trim(),
-          suggestionsJson: suggestions as object[],
+          suggestionsJson: suggestions,
         },
       })
       savedId = saved.id
@@ -60,6 +72,7 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: 'Failed to generate suggestions' }, { status: 500 })
   }
 }
+
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
