@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Bell, MapPin, ChevronDown, Search, Sparkles, ChevronRight } from "lucide-react";
 import DestinationCard from "@/components/destination/DestinationCard";
 import { FEATURED, POPULAR } from "@/lib/seed-data";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 const FILTER_CHIPS = [
   "All",
@@ -26,10 +27,13 @@ export default function HomePage() {
           <span className="text-ride-orange font-bold text-xl tracking-tight">
             RideOut
           </span>
-          <button className="relative p-2 rounded-full bg-ride-surface border border-ride-border">
-            <Bell size={18} className="text-ride-text" />
-            <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-ride-orange" />
-          </button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <button className="relative p-2 rounded-full bg-ride-surface border border-ride-border">
+              <Bell size={18} className="text-ride-text" />
+              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-ride-orange" />
+            </button>
+          </div>
         </div>
         <p className="text-ride-muted text-sm">Where are you riding today?</p>
 

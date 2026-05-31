@@ -18,6 +18,21 @@
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
+[data-theme="light"] {
+  --color-ride-bg:         #F8FAFC;
+  --color-ride-surface:    #FFFFFF;
+  --color-ride-surface2:   #F1F5F9;
+  --color-ride-orange:     #EA6C0B;
+  --color-ride-orange-dim: #FEF3C7;
+  --color-ride-sky:        #0369A1;
+  --color-ride-sky-dim:    #E0F2FE;
+  --color-ride-text:       #0F172A;
+  --color-ride-muted:      #64748B;
+  --color-ride-border:     rgba(0, 0, 0, 0.08);
+  --color-ride-green:      #16A34A;
+  --color-ride-yellow:     #CA8A04;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -28,8 +43,8 @@ body {
 }
 
 body {
-  background-color: #0F172A;
-  color: #F8FAFC;
+  background-color: var(--color-ride-bg);
+  color: var(--color-ride-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
